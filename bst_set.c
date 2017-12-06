@@ -187,3 +187,27 @@ static int _get_height(BSTNode *node) {
 	return MAX_OF(_get_height(node->left), _get_height(node->right))
 		+ 1;
 }
+
+void destroy_BST(BSTSet *bst, void (* data_destructor)(void *data)) {
+	if (bst == NULL || data_destructor == NULL) {
+		return;
+	}
+
+	_destroy_bst(bst->root, data_destructor);
+}
+
+void _destroy_bst(BSTNode *node, void (* data_destructor)(void *data)) {
+	if (node == NULL) {
+		return;
+	}
+
+	// Why bother at all with these temporary "left" and "right"
+	// variables? Trying to get some tail-optimized recursion.
+	// I'm not sure if this is the way to go about it.
+	BSTNode *left = node->left;
+	BSTNode *right = node->right;
+	data_destructor(node->data);
+	free(node);
+	_destroy_bst(left, data_destructor);
+	_destroy_bst(right, data_destructor);
+}
